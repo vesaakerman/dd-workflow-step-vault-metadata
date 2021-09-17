@@ -20,7 +20,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import nl.knaw.dans.wf.vaultmd.resources.InvokeResource;
+import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
+import nl.knaw.dans.wf.vaultmd.core.taskqueue.ActiveTaskQueue;
+import nl.knaw.dans.wf.vaultmd.core.taskqueue.SetVaultMetadataTask;
+import nl.knaw.dans.wf.vaultmd.resources.StepInvocationResource;
 
 public class DdWorkflowStepVaultMetadataApplication extends Application<DdWorkflowStepVaultMetadataConfiguration> {
 
@@ -40,7 +43,9 @@ public class DdWorkflowStepVaultMetadataApplication extends Application<DdWorkfl
 
     @Override
     public void run(final DdWorkflowStepVaultMetadataConfiguration configuration, final Environment environment) {
-        environment.jersey().register(new InvokeResource());
+        final ActiveTaskQueue<StepInvocation> queue = new ActiveTaskQueue<>();
+        queue.start();
+        environment.jersey().register(new StepInvocationResource(queue));
     }
 
 }

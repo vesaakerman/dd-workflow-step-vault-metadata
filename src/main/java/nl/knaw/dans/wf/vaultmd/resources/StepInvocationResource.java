@@ -15,32 +15,36 @@
  */
 package nl.knaw.dans.wf.vaultmd.resources;
 
-import nl.knaw.dans.wf.vaultmd.api.InvocationMessage;
-import org.apache.commons.io.IOUtils;
+import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
+import nl.knaw.dans.wf.vaultmd.core.taskqueue.ActiveTaskQueue;
+import nl.knaw.dans.wf.vaultmd.core.taskqueue.SetVaultMetadataTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 
 @Path("/invoke")
 @Produces(MediaType.APPLICATION_JSON)
-public class InvokeResource {
+public class StepInvocationResource {
 
-    private static final Logger log = LoggerFactory.getLogger(InvokeResource.class);
+    private static final Logger log = LoggerFactory.getLogger(StepInvocationResource.class);
+
+    private final ActiveTaskQueue<StepInvocation> queue;
+
+    public StepInvocationResource(ActiveTaskQueue<StepInvocation> queue) {
+        this.queue = queue;
+    }
+
 
     @POST
-    public void run(@Valid InvocationMessage inv) throws IOException {
+    public void run(@Valid StepInvocation inv) throws IOException {
         log.info("Received invocation: {}", inv);
+        queue.add(new SetVaultMetadataTask(inv));
     }
 
 }
