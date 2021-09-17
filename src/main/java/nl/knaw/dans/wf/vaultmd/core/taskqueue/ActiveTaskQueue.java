@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2021 DANS - Data Archiving and Networked Services (info@dans.knaw.nl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,16 +21,26 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class ActiveTaskQueue<T> extends AbstractTaskQueue<T> {
 
     private static final Logger log = LoggerFactory.getLogger(ActiveTaskQueue.class);
-    private final Executor executor = Executors.newSingleThreadExecutor();
+    private final Executor executor;
+
+    public ActiveTaskQueue(Executor executor) {
+        this.executor = executor;
+    }
+
+
+
 
     public void start() {
         executor.execute(() -> {
             try {
-                Optional<Task<T>> next; while ((next = tasks.take()).isPresent()) {
+                Optional<Task<T>> next; if ((next = tasks.take()).isPresent()) {
                     next.map(t -> {
                         try {
                             t.run();
@@ -45,6 +55,11 @@ public class ActiveTaskQueue<T> extends AbstractTaskQueue<T> {
                 e.printStackTrace();
             }
         });
+    }
+
+    public void stop() {
+        tasks.clear();
+        add(null);
     }
 }
 

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2021 DANS - Data Archiving and Networked Services (info@dans.knaw.nl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,14 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.knaw.dans.wf.vaultmd;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 public class DdWorkflowStepVaultMetadataConfiguration extends Configuration {
+
+    @Valid
+    @NotNull
+    private ThreadPoolExecutorFactory taskExecutorThreadPool;
+
+    @JsonProperty("taskExecutorThreadPool")
+    public void setTaskExecutorThreadPool(ThreadPoolExecutorFactory taskExecutorThreadPool) {
+        this.taskExecutorThreadPool = taskExecutorThreadPool;
+    }
+
+    @JsonProperty("taskExecutorThreadPool")
+    public ThreadPoolExecutorFactory getTaskExecutorThreadPool() {
+        return taskExecutorThreadPool;
+    }
 
 }

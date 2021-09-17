@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2021 DANS - Data Archiving and Networked Services (info@dans.knaw.nl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.knaw.dans.wf.vaultmd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import io.dropwizard.Application;
+import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
 import nl.knaw.dans.wf.vaultmd.core.taskqueue.ActiveTaskQueue;
-import nl.knaw.dans.wf.vaultmd.core.taskqueue.SetVaultMetadataTask;
 import nl.knaw.dans.wf.vaultmd.resources.StepInvocationResource;
+
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class DdWorkflowStepVaultMetadataApplication extends Application<DdWorkflowStepVaultMetadataConfiguration> {
 
@@ -43,9 +44,8 @@ public class DdWorkflowStepVaultMetadataApplication extends Application<DdWorkfl
 
     @Override
     public void run(final DdWorkflowStepVaultMetadataConfiguration configuration, final Environment environment) {
-        final ActiveTaskQueue<StepInvocation> queue = new ActiveTaskQueue<>();
-        queue.start();
-        environment.jersey().register(new StepInvocationResource(queue));
+        final ThreadPoolExecutor executor = configuration.getTaskExecutorThreadPool().build(environment);
+        environment.jersey().register(new StepInvocationResource(executor));
     }
 
 }

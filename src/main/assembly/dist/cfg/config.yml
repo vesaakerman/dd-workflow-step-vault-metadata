@@ -9,5 +9,7 @@ server:
   maxThreads: 1024
 
 
-#activeTaskQueue:
-#  executor: 
+taskExecutorThreadPool:
+  minThreads: 1
+  maxThreads: 1
+  maxIdleSeconds: 60

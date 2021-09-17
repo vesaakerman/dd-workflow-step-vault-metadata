@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2021 DANS - Data Archiving and Networked Services (info@dans.knaw.nl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +36,13 @@ public class SetVaultMetadataTask implements Task<StepInvocation> {
     @Override
     public void run() throws TaskFailedException {
         log.info("Running task " + this);
+        try {
+            Thread.sleep(15000);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        log.info("Done running task " + this);
     }
 
     @Override

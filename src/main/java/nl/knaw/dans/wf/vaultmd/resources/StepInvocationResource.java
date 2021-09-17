@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2021 DANS - Data Archiving and Networked Services (info@dans.knaw.nl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package nl.knaw.dans.wf.vaultmd.resources;
 import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
 import nl.knaw.dans.wf.vaultmd.core.taskqueue.ActiveTaskQueue;
 import nl.knaw.dans.wf.vaultmd.core.taskqueue.SetVaultMetadataTask;
+import nl.knaw.dans.wf.vaultmd.core.taskqueue.TaskFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.util.concurrent.Executor;
 
 @Path("/invoke")
 @Produces(MediaType.APPLICATION_JSON)
@@ -34,17 +36,25 @@ public class StepInvocationResource {
 
     private static final Logger log = LoggerFactory.getLogger(StepInvocationResource.class);
 
-    private final ActiveTaskQueue<StepInvocation> queue;
+    private final Executor executor;
 
-    public StepInvocationResource(ActiveTaskQueue<StepInvocation> queue) {
-        this.queue = queue;
+    public StepInvocationResource(Executor executor) {
+        this.executor = executor;
     }
 
 
     @POST
     public void run(@Valid StepInvocation inv) throws IOException {
         log.info("Received invocation: {}", inv);
-        queue.add(new SetVaultMetadataTask(inv));
+        executor.execute( () -> {
+            try {
+                new SetVaultMetadataTask(inv).run();
+            }
+            catch (TaskFailedException e) {
+                e.printStackTrace();
+            }
+        });
+        log.info("Added new task to queue");
     }
 
 }
