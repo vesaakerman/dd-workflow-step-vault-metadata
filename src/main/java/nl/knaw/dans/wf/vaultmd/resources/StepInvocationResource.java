@@ -16,7 +16,7 @@
 package nl.knaw.dans.wf.vaultmd.resources;
 
 import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
-import nl.knaw.dans.wf.vaultmd.core.taskqueue.SetVaultMetadataTask;
+import nl.knaw.dans.wf.vaultmd.core.SetVaultMetadataTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.wf.vaultmd.core.taskqueue;
+package nl.knaw.dans.wf.vaultmd.core;
 
 import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
 import org.slf4j.Logger;
