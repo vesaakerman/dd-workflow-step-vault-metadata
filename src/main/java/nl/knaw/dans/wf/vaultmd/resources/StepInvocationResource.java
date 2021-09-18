@@ -17,6 +17,7 @@ package nl.knaw.dans.wf.vaultmd.resources;
 
 import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
 import nl.knaw.dans.wf.vaultmd.core.SetVaultMetadataTask;
+import org.apache.http.client.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,15 +36,17 @@ public class StepInvocationResource {
     private static final Logger log = LoggerFactory.getLogger(StepInvocationResource.class);
 
     private final Executor executor;
+    private final HttpClient httpClient;
 
-    public StepInvocationResource(Executor executor) {
+    public StepInvocationResource(Executor executor, HttpClient httpClient) {
         this.executor = executor;
+        this.httpClient = httpClient;
     }
 
     @POST
     public void run(@Valid StepInvocation inv) throws IOException {
         log.info("Received invocation: {}", inv);
-        executor.execute(new SetVaultMetadataTask(inv));
+        executor.execute(new SetVaultMetadataTask(inv, httpClient));
         log.info("Added new task to queue");
     }
 
