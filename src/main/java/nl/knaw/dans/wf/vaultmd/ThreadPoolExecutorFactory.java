@@ -22,12 +22,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+// TODO: Move to dans-utils (or should it be named dans-dropwizard-utils? It has a dependency on DropWizard classes)
 public class ThreadPoolExecutorFactory {
+
     private static final Logger log = LoggerFactory.getLogger(ThreadPoolExecutorFactory.class);
+
+    private int maxQueueSize;
 
     private int minThreads;
 
@@ -36,15 +39,16 @@ public class ThreadPoolExecutorFactory {
     private long maxIdleSeconds;
 
     public ThreadPoolExecutor build(Environment environment) {
-        final ThreadPoolExecutor executor = new ThreadPoolExecutor(minThreads, maxThreads, maxIdleSeconds, TimeUnit.SECONDS,new LinkedBlockingDeque<>());
-        log.info("Created thread pool executor minThreads = " +  minThreads +  ", maxThreads = " + maxThreads);
+        final ThreadPoolExecutor executor = new ThreadPoolExecutor(minThreads, maxThreads, maxIdleSeconds, TimeUnit.SECONDS, new LinkedBlockingDeque<>(maxQueueSize));
+        log.info("Created thread pool executor minThreads = " + minThreads + ", maxThreads = " + maxThreads);
         environment.lifecycle().manage(new Managed() {
+
             @Override
-            public void start() throws Exception {
+            public void start() {
             }
 
             @Override
-            public void stop() throws Exception {
+            public void stop() {
                 executor.shutdown();
             }
         });
@@ -79,5 +83,15 @@ public class ThreadPoolExecutorFactory {
     @JsonProperty
     public void setMaxIdleSeconds(long maxIdleSeconds) {
         this.maxIdleSeconds = maxIdleSeconds;
+    }
+
+    @JsonProperty
+    public int getMaxQueueSize() {
+        return maxQueueSize;
+    }
+
+    @JsonProperty
+    public void setMaxQueueSize(int maxQueueSize) {
+        this.maxQueueSize = maxQueueSize;
     }
 }

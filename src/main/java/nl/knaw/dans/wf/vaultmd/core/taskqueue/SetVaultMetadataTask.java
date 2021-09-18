@@ -19,7 +19,7 @@ import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SetVaultMetadataTask implements Task<StepInvocation> {
+public class SetVaultMetadataTask implements Runnable{
 
     private static final Logger log = LoggerFactory.getLogger(SetVaultMetadataTask.class);
     private final StepInvocation stepInvocation;
@@ -34,19 +34,18 @@ public class SetVaultMetadataTask implements Task<StepInvocation> {
     }
 
     @Override
-    public void run() throws TaskFailedException {
+    public void run()  {
         log.info("Running task " + this);
         try {
-            Thread.sleep(15000);
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
+            try {
+                Thread.sleep(15000);
+            }
+            catch (InterruptedException e) {
+            }
+        } catch (RuntimeException e) {
+            log.warn("Task execution failed for task " + this, e);
         }
         log.info("Done running task " + this);
     }
 
-    @Override
-    public StepInvocation getTarget() {
-        return stepInvocation;
-    }
 }

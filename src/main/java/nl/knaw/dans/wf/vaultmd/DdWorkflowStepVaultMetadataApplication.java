@@ -17,11 +17,8 @@ package nl.knaw.dans.wf.vaultmd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import io.dropwizard.Application;
-import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
-import nl.knaw.dans.wf.vaultmd.core.taskqueue.ActiveTaskQueue;
 import nl.knaw.dans.wf.vaultmd.resources.StepInvocationResource;
 
 import java.util.concurrent.ThreadPoolExecutor;

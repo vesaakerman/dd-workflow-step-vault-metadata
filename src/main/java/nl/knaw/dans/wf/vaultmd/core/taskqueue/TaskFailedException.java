@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.wf.vaultmd.core.taskqueue;
 
-public class TaskFailedException extends Exception {
+public class TaskFailedException extends RuntimeException {
 
     public TaskFailedException(String msg, Throwable cause) {
         super(msg, cause);
