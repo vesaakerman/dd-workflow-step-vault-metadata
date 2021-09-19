@@ -26,21 +26,12 @@ public class DdWorkflowStepVaultMetadataConfiguration extends Configuration {
 
     @Valid
     @NotNull
-    private HttpClientConfiguration httpClient = new HttpClientConfiguration();
+    private ThreadPoolExecutorFactory taskExecutorThreadPool;
 
     @Valid
     @NotNull
-    private ThreadPoolExecutorFactory taskExecutorThreadPool;
+    private DataverseClientFactory dataverse;
 
-    @JsonProperty("httpClient")
-    public HttpClientConfiguration getHttpClientConfiguration() {
-        return httpClient;
-    }
-
-    @JsonProperty("httpClient")
-    public void setHttpClientConfiguration(HttpClientConfiguration httpClient) {
-        this.httpClient = httpClient;
-    }
 
     @JsonProperty("taskExecutorThreadPool")
     public void setTaskExecutorThreadPool(ThreadPoolExecutorFactory taskExecutorThreadPool) {
@@ -52,4 +43,13 @@ public class DdWorkflowStepVaultMetadataConfiguration extends Configuration {
         return taskExecutorThreadPool;
     }
 
+    @JsonProperty("dataverse")
+    public DataverseClientFactory getDataverse() {
+        return dataverse;
+    }
+
+    @JsonProperty("dataverse")
+    public void setDataverse(DataverseClientFactory dataverse) {
+        this.dataverse = dataverse;
+    }
 }

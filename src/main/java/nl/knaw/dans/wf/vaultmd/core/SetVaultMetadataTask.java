@@ -15,29 +15,24 @@
  */
 package nl.knaw.dans.wf.vaultmd.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 public class SetVaultMetadataTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(SetVaultMetadataTask.class);
     private final StepInvocation stepInvocation;
-    private final HttpClient httpClient;
+    private final DataverseClient dataverseClient;
 
-    public SetVaultMetadataTask(StepInvocation stepInvocation, HttpClient httpClient) {
+    public SetVaultMetadataTask(StepInvocation stepInvocation, DataverseClient dataverseClient) {
         this.stepInvocation = stepInvocation;
-        this.httpClient = httpClient;
+        this.dataverseClient = dataverseClient;
     }
 
     @Override
@@ -60,21 +55,11 @@ public class SetVaultMetadataTask implements Runnable {
         }
         log.info("Resuming publication");
         try {
-            HttpPost post = new HttpPost(new URI("http://dar.dans.knaw.nl:8080/api/workflows/" + stepInvocation.getInvocationId()));
-            ResumeMessage msg = new ResumeMessage("Success", "", "");
-            ObjectMapper mapper = new ObjectMapper(); // TODO: reuse
-            post.setEntity(new StringEntity(mapper.writeValueAsString(msg)));
-            HttpResponse response = httpClient.execute(post);
+            HttpResponse response = dataverseClient.workflows().resume(stepInvocation.getInvocationId(), new ResumeMessage("Success", "", ""));
             log.info("Resume call returned " + response.getStatusLine());
         }
-        catch (URISyntaxException e) {
-            log.error("Invalid URI for resume call", e);
-        }
-        catch (ClientProtocolException e) {
-            e.printStackTrace();
-        }
         catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Resume call failed", e);
         }
 
         log.info("Done running task " + this);
