@@ -15,22 +15,22 @@
  */
 package nl.knaw.dans.wf.vaultmd.core;
 
+import nl.knaw.dans.lib.dataverse.DatasetApi;
+import nl.knaw.dans.lib.dataverse.DataverseInstance;
 import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
+import nl.knaw.dans.wf.vaultmd.legacy.SetVaultMetadataTaskScala;
+import nl.knaw.dans.wf.vaultmd.legacy.WorkflowVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
+import scala.Option;
 
 public class SetVaultMetadataTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(SetVaultMetadataTask.class);
     private final StepInvocation stepInvocation;
-    private final DataverseClient dataverseClient;
+    private final DataverseInstance dataverseClient;
 
-    public SetVaultMetadataTask(StepInvocation stepInvocation, DataverseClient dataverseClient) {
+    public SetVaultMetadataTask(StepInvocation stepInvocation, DataverseInstance dataverseClient) {
         this.stepInvocation = stepInvocation;
         this.dataverseClient = dataverseClient;
     }
@@ -43,26 +43,8 @@ public class SetVaultMetadataTask implements Runnable {
     @Override
     public void run() {
         log.info("Running task " + this);
-        try {
-            try {
-                Thread.sleep(3000);
-            }
-            catch (InterruptedException e) {
-            }
-        }
-        catch (RuntimeException e) {
-            log.warn("Task execution failed for task " + this, e);
-        }
-        log.info("Resuming publication");
-        try {
-            HttpResponse response = dataverseClient.workflows().resume(stepInvocation.getInvocationId(), new ResumeMessage("Success", "", ""));
-            log.info("Resume call returned " + response.getStatusLine());
-        }
-        catch (IOException e) {
-            log.warn("Resume call failed", e);
-        }
-
-        log.info("Done running task " + this);
+        new SetVaultMetadataTaskScala(
+            WorkflowVariables.apply(stepInvocation.getInvocationId(), stepInvocation.getGlobalId(), stepInvocation.getDatasetId(), stepInvocation.getMajorVersion(), stepInvocation.getMinorVersion()),
+            dataverseClient, "nl:ui:13-", 10, 1000).run();
     }
-
 }
