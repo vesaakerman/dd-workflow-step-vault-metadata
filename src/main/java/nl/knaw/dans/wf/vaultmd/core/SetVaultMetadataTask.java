@@ -15,14 +15,12 @@
  */
 package nl.knaw.dans.wf.vaultmd.core;
 
-import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseInstance;
 import nl.knaw.dans.wf.vaultmd.api.StepInvocation;
 import nl.knaw.dans.wf.vaultmd.legacy.SetVaultMetadataTaskScala;
 import nl.knaw.dans.wf.vaultmd.legacy.WorkflowVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Option;
 
 public class SetVaultMetadataTask implements Runnable {
 

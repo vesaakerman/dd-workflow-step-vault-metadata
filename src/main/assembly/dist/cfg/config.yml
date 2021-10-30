@@ -1,15 +1,49 @@
 #
-# Module configuration file
+# dd-workflow-step-vault-metadata
 #
-# Please, modify the configuration below to match your environment. Also, delete and/or modify
-# this description.
 
 server:
-  type: default
-  maxThreads: 1024
+  applicationContextPath: /
+  adminContextPath: /
+  applicationConnectors:
+    - type: http
+      port: 20210
+  adminConnectors:
+    - type: http
+      port: 20211
 
+#
+# See https://www.dropwizard.io/en/latest/manual/configuration.html#logging
+#
+logging:
+  level: INFO
+  loggers:
+    "dans.knaw.nl":
+      level: DEBUG
+      additive: false
+  appenders:
+    - type: console
+      logFormat: "%-5p [%d{ISO8601}] [%t] %c: %m%n%rEx"
 
+    - type: file
+      archive: false
+      currentLogFilename: data/dd-workflow-step-vault-metadata.log
+
+#
+# Configures the threads on which the vault metadata setting actions are executed.
+#
 taskExecutorThreadPool:
-  minThreads: 1
-  maxThreads: 1
+  maxQueueSize: 4
+  # Number of threads will be increased when maxQueueSize is exceeded.
+  minThreads: 2
+  # No more than maxThreads will be created though
+  maxThreads: 10
+  # Threads will die after 60 seconds of idleness
   maxIdleSeconds: 60
+
+dataverse:
+  baseUrl: "http://localhost:8080/"
+  apiVersion: 1
+  connectionTimeoutMs: 10000
+  readTimeoutMs: 30000
+  apiKey: "" # Not used?
