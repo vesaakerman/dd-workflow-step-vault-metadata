@@ -49,7 +49,7 @@ The configuration options are documented with comments int the `config.yml` conf
 
 ### Dataverse configuration
 To configure Dataverse to call this service, you must add it as an [http/authext](https://guides.dataverse.org/en/latest/developers/workflows.html#http-authext)
-workflow step to the default `PrePublishDataset` workflow.
+workflow step to the default `PrePublishDataset` workflow. The JSON to use in the step is included in `INSTALL_DIR/install/workflow-step.json`.
 
 BUILDING FROM SOURCE
 --------------------
