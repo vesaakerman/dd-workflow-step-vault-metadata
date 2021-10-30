@@ -17,18 +17,12 @@ server:
 #
 logging:
   level: INFO
-  loggers:
-    "dans.knaw.nl":
-      level: DEBUG
-      additive: false
   appenders:
-    - type: console
-      logFormat: "%-5p [%d{ISO8601}] [%t] %c: %m%n%rEx"
-
     - type: file
-      archive: false
-      currentLogFilename: data/dd-workflow-step-vault-metadata.log
-
+      archive: true
+      currentLogFilename: /var/opt/dans.knaw.nl/log/dd-workflow-step-vault-metadata/dd-workflow-step-vault-metadata.log
+      archivedLogFilenamePattern: /var/opt/dans.knaw.nl/log/dd-workflow-step-vault-metadata/dd-workflow-step-vault-metadata-%d.log
+      archivedFileCount: 5
 #
 # Configures the threads on which the vault metadata setting actions are executed.
 #
@@ -41,6 +35,10 @@ taskExecutorThreadPool:
   # Threads will die after 60 seconds of idleness
   maxIdleSeconds: 60
 
+#
+# The Dataverse instance that the invocations will come from. It is currently not possible to handle
+# requests from multiple Dataverse instances.
+#
 dataverse:
   baseUrl: "http://localhost:8080/"
   apiVersion: 1
