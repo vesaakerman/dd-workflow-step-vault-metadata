@@ -25,7 +25,7 @@ import nl.knaw.dans.wf.vaultmd.health.DataverseResponsiveCheck;
 import nl.knaw.dans.wf.vaultmd.resources.StepInvocationResource;
 import nl.knaw.dans.wf.vaultmd.resources.StepRollbackResource;
 
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 
 public class DdWorkflowStepVaultMetadataApplication extends Application<DdWorkflowStepVaultMetadataConfiguration> {
 
@@ -48,7 +48,7 @@ public class DdWorkflowStepVaultMetadataApplication extends Application<DdWorkfl
         final DataverseInstanceConfig dvConfig = configuration.getDataverse().build();
         final DataverseInstance dv = new DataverseInstance(dvConfig);
         environment.healthChecks().register("Dataverse", new DataverseResponsiveCheck(dv));
-        final ThreadPoolExecutor executor = configuration.getTaskExecutorThreadPool().build(environment);
+        ExecutorService executor = configuration.getTaskQueue().build(environment);
         environment.jersey().register(new StepInvocationResource(executor, dv));
         environment.jersey().register(new StepRollbackResource(executor, dv));
     }

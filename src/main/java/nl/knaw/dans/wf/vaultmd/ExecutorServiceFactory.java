@@ -15,20 +15,20 @@
  */
 package nl.knaw.dans.wf.vaultmd;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Environment;
+import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 // TODO: Move to dans-utils (or should it be named dans-dropwizard-utils? It has a dependency on DropWizard classes)
-public class ThreadPoolExecutorFactory {
+public class ExecutorServiceFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(ThreadPoolExecutorFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(ExecutorServiceFactory.class);
+
+    private String nameFormat;
 
     private int maxQueueSize;
 
@@ -36,61 +36,53 @@ public class ThreadPoolExecutorFactory {
 
     private int maxThreads;
 
-    private long maxIdleSeconds;
+    private String keepAliveTime;
 
-    public ThreadPoolExecutor build(Environment environment) {
-        final ThreadPoolExecutor executor = new ThreadPoolExecutor(minThreads, maxThreads, maxIdleSeconds, TimeUnit.SECONDS, new LinkedBlockingDeque<>(maxQueueSize));
-        log.info("Created thread pool executor minThreads = " + minThreads + ", maxThreads = " + maxThreads);
-        environment.lifecycle().manage(new Managed() {
-
-            @Override
-            public void start() {
-            }
-
-            @Override
-            public void stop() {
-                executor.shutdown();
-            }
-        });
-        return executor;
+    public ExecutorService build(Environment environment) {
+        return environment.lifecycle().executorService(nameFormat)
+            .workQueue(new LinkedBlockingDeque<>(maxQueueSize))
+            .minThreads(minThreads)
+            .maxThreads(maxThreads)
+            .keepAliveTime(Duration.parse(keepAliveTime))
+            .build();
     }
 
-    @JsonProperty
+    public String getNameFormat() {
+        return nameFormat;
+    }
+
+    public void setNameFormat(String nameFormat) {
+        this.nameFormat = nameFormat;
+    }
+
     public int getMinThreads() {
         return minThreads;
     }
 
-    @JsonProperty
     public void setMinThreads(int minThreads) {
         this.minThreads = minThreads;
     }
 
-    @JsonProperty
     public int getMaxThreads() {
         return maxThreads;
     }
 
-    @JsonProperty
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
     }
 
-    @JsonProperty
-    public long getMaxIdleSeconds() {
-        return maxIdleSeconds;
+    public String getKeepAliveTime() {
+        return keepAliveTime;
     }
 
-    @JsonProperty
-    public void setMaxIdleSeconds(long maxIdleSeconds) {
-        this.maxIdleSeconds = maxIdleSeconds;
+    public void setKeepAliveTime(String keepAliveTime) {
+        this.keepAliveTime = keepAliveTime;
     }
 
-    @JsonProperty
     public int getMaxQueueSize() {
         return maxQueueSize;
     }
 
-    @JsonProperty
     public void setMaxQueueSize(int maxQueueSize) {
         this.maxQueueSize = maxQueueSize;
     }

@@ -15,7 +15,6 @@
  */
 package nl.knaw.dans.wf.vaultmd;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 
 import javax.validation.Valid;
@@ -25,29 +24,24 @@ public class DdWorkflowStepVaultMetadataConfiguration extends Configuration {
 
     @Valid
     @NotNull
-    private ThreadPoolExecutorFactory taskExecutorThreadPool;
+    private ExecutorServiceFactory taskQueue;
 
     @Valid
     @NotNull
     private DataverseInstanceConfigFactory dataverse;
 
-
-    @JsonProperty("taskExecutorThreadPool")
-    public void setTaskExecutorThreadPool(ThreadPoolExecutorFactory taskExecutorThreadPool) {
-        this.taskExecutorThreadPool = taskExecutorThreadPool;
+    public void setTaskQueue(ExecutorServiceFactory taskExecutorThreadPool) {
+        this.taskQueue = taskExecutorThreadPool;
     }
 
-    @JsonProperty("taskExecutorThreadPool")
-    public ThreadPoolExecutorFactory getTaskExecutorThreadPool() {
-        return taskExecutorThreadPool;
+    public ExecutorServiceFactory getTaskQueue() {
+        return taskQueue;
     }
 
-    @JsonProperty("dataverse")
     public DataverseInstanceConfigFactory getDataverse() {
         return dataverse;
     }
 
-    @JsonProperty("dataverse")
     public void setDataverse(DataverseInstanceConfigFactory dataverse) {
         this.dataverse = dataverse;
     }
