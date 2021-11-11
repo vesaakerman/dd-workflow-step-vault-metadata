@@ -16,6 +16,7 @@
 package nl.knaw.dans.wf.vaultmd;
 
 import io.dropwizard.Configuration;
+import nl.knaw.dans.lib.util.ExecutorServiceFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
