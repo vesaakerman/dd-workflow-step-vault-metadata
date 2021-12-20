@@ -35,7 +35,9 @@ public class DataverseResponsiveCheck extends HealthCheck {
     @Override
     protected Result check() {
         try {
-            dataverseClient.checkConnection();
+            log.info("Checking if root dataverse can be reached...");
+            dataverseClient.dataverse("root").view();
+            log.info("OK: root dataverse is reachable.");
         }
         catch (IOException | DataverseException e) {
             log.warn("Dataverse connection check failed", e);

@@ -16,7 +16,7 @@
 package nl.knaw.dans.wf.vaultmd.legacy
 
 import nl.knaw.dans.lib.dataverse.model.workflow.ResumeMessage
-import nl.knaw.dans.lib.dataverse.{ DataverseClient, DataverseException, DataverseResponse, Version }
+import nl.knaw.dans.lib.dataverse.{ DataverseClient, DataverseException, DataverseResponse }
 import nl.knaw.dans.lib.dataverse.model.dataset.{ FieldList, MetadataBlock, MetadataField, PrimitiveSingleValueField }
 import nl.knaw.dans.lib.error.TryExtensions
 import nl.knaw.dans.wf.vaultmd.core.SetVaultMetadataTask
@@ -56,8 +56,8 @@ class SetVaultMetadataTaskScala(workFlowVariables: WorkflowVariables, dataverse:
   private def editVaultMetadata(): Try[Unit] = {
     logger.trace("ENTER")
     for {
-      draftDsvJson <- getDatasetVersion(Version.DRAFT)
-      optLatestPublishedDsvJson <- if (hasLatestPublishedVersion(workFlowVariables)) getDatasetVersion(Version.LATEST_PUBLISHED).map(Option(_))
+      draftDsvJson <- getDatasetVersion(":draft")
+      optLatestPublishedDsvJson <- if (hasLatestPublishedVersion(workFlowVariables)) getDatasetVersion(":latest-published").map(Option(_))
                                    else Success(None)
       bagId = getBagId(getVaultMetadataFieldValue(draftDsvJson, "dansBagId"), optLatestPublishedDsvJson, workFlowVariables)
       nbn = optLatestPublishedDsvJson
@@ -71,9 +71,9 @@ class SetVaultMetadataTaskScala(workFlowVariables: WorkflowVariables, dataverse:
     } yield ()
   }
 
-  private def getDatasetVersion(version: Version): Try[JValue] = {
+  private def getDatasetVersion(version: String): Try[JValue] = {
     for {
-      response <- Try { dataset.getVersion(version.toString) }
+      response <- Try { dataset.getVersion(version) }
       dsv <- Try { response.getData }
       json <- Try { JsonMethods.parse(dsv.toString) }
     } yield json
