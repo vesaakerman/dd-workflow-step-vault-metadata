@@ -74,8 +74,8 @@ class SetVaultMetadataTaskScala(workFlowVariables: WorkflowVariables, dataverse:
   private def getDatasetVersion(version: String): Try[JValue] = {
     for {
       response <- Try { dataset.getVersion(version) }
-      dsv <- Try { response.getData }
-      json <- Try { JsonMethods.parse(dsv.toString) }
+      dsv <- Try { response.getEnvelopeAsString }
+      json <- Try { JsonMethods.parse(dsv) }
     } yield json
   }
 
