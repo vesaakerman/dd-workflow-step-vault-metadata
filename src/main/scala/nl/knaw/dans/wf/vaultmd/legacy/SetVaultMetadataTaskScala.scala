@@ -16,7 +16,7 @@
 package nl.knaw.dans.wf.vaultmd.legacy
 
 import nl.knaw.dans.lib.dataverse.model.workflow.ResumeMessage
-import nl.knaw.dans.lib.dataverse.{ DataverseClient, DataverseException, DataverseResponse }
+import nl.knaw.dans.lib.dataverse.{ DataverseClient, DataverseException, DataverseHttpResponse }
 import nl.knaw.dans.lib.dataverse.model.dataset.{ FieldList, MetadataBlock, MetadataField, PrimitiveSingleValueField }
 import nl.knaw.dans.lib.error.TryExtensions
 import nl.knaw.dans.wf.vaultmd.core.SetVaultMetadataTask
@@ -37,7 +37,7 @@ class SetVaultMetadataTaskScala(workFlowVariables: WorkflowVariables, dataverse:
   private val logger = LoggerFactory.getLogger(classOf[SetVaultMetadataTask])
 
   require(nbnPrefix != null)
-  private val dataset = dataverse.dataset(workFlowVariables.globalId)
+  private val dataset = dataverse.dataset(workFlowVariables.globalId, workFlowVariables.invocationId)
 
   def run(): Try[Unit] = {
     (for {
@@ -168,13 +168,13 @@ class SetVaultMetadataTaskScala(workFlowVariables: WorkflowVariables, dataverse:
     else Success(())
   }
 
-  private def checkForInvocationIdNotFoundError(resumeResponse: Try[DataverseResponse[AnyRef]], invocationId: String): Try[Boolean] = {
-    resumeResponse.map(r => isError(r.getEnvelope.getStatus))
+  private def checkForInvocationIdNotFoundError(resumeResponse: Try[DataverseHttpResponse[AnyRef]], invocationId: String): Try[Boolean] = {
+    resumeResponse.map(r => isError(r.getHttpResponse.getStatusLine.getStatusCode))
       .recover { case e: DataverseException if e.getStatus == HTTP_NOT_FOUND => true }
       .recoverWith { case e: Throwable => Failure(ExternalSystemCallException(s"Resume could not be called for dataset: $invocationId ", e)) }
   }
 
-  private def isError(status: String) = {
-    status.startsWith("4") || status.startsWith("5")
+  private def isError(status: Int) = {
+    status >= 400
   }
 }
