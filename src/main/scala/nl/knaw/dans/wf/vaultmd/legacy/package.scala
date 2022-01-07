@@ -15,13 +15,15 @@
  */
 package nl.knaw.dans.wf.vaultmd
 
-import nl.knaw.dans.lib.dataverse.model.dataset.{ CompoundField, ControlledSingleValueField, MetadataField, PrimitiveMultiValueField, PrimitiveSingleValueField }
+import nl.knaw.dans.lib.dataverse.model.dataset.{ CompoundField, ControlledSingleValueField, MetadataBlock, MetadataField, PrimitiveMultiValueField, PrimitiveSingleValueField }
 import org.json4s.{ CustomSerializer, DefaultFormats, Extraction, Formats, JNull, JObject }
 
+import java.util
 import scala.collection.mutable
+import collection.JavaConverters._
 
 package object legacy {
-  implicit val jsonFormats: Formats = DefaultFormats + MetadataFieldSerializer
+  implicit val jsonFormats: Formats = DefaultFormats + MetadataFieldSerializer + MetadataBlockSerializer
 
 
 
@@ -32,6 +34,10 @@ package object legacy {
   case class InvocationIdNotFoundException(numberOfTimesTried: Int, waitTimeInMilliseconds: Int) extends RuntimeException(s"Workflow was not paused. Number of tries = $numberOfTimesTried, wait time between tries = $waitTimeInMilliseconds ms.")
 
   type JsonObject = Map[String, MetadataField]
+
+  case class MetadataBlockScala(displayName: String, name: String, fields: List[MetadataField]) extends MetadataBlock {
+    override def getFields: util.List[MetadataField] = { fields.asJava }
+  }
 
   case class FieldMap() {
     private val fields = mutable.Map[String, MetadataField]()
@@ -59,6 +65,14 @@ package object legacy {
         case "controlledVocabulary" => Extraction.extract[PrimitiveMultiValueField](jsonObj)
         case "compound" => Extraction.extract[CompoundField](jsonObj)
       }
+  }, {
+    case null => JNull
+  }
+  ))
+
+  object MetadataBlockSerializer extends CustomSerializer[MetadataBlock](format => ( {
+    case jsonObj: JObject =>
+      Extraction.extract[MetadataBlockScala](jsonObj)
   }, {
     case null => JNull
   }
