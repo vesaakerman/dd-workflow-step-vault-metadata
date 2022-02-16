@@ -47,7 +47,7 @@ package object legacy {
     }
 
     def addCvField(name: String, value: String): Unit = {
-      fields.put(name, new ControlledSingleValueField("controlledVocabulary", name, value))
+      fields.put(name, new ControlledSingleValueField(name, value))
     }
 
     def toJsonObject: JsonObject = fields.toMap
